@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>infinite well</title>
+  <style>
+    :root { color-scheme: dark; }
+    body { margin: 0; background: #070b16; color: #dce6ff; font-family: ui-sans-serif, system-ui, sans-serif; }
+    main { max-width: 720px; margin: 1.5rem auto; padding: 0 1rem 2rem; }
+    canvas { width: 100%; background: #0d1324; border: 1px solid #243056; border-radius: 12px; }
+    label { display: block; margin: .6rem 0; }
+    input[type=range] { width: 100%; }
+    .meta { color: #9aa6c9; font-variant-numeric: tabular-nums; }
+    a { color: #a78bfa; }
+  </style>
+</head>
+<body>
+<main>
+  <h1 style="font-size:1.1rem">infinite well</h1>
+  <p class="meta">ψ_n(x) = √(2/L) sin(nπx/L) &nbsp;·&nbsp; booth lives at <a href="https://เรียนควอนตัม.com">เรียนควอนตัม.com</a></p>
+  <canvas id="c" width="900" height="360"></canvas>
+  <label>n = <span id="nv">1</span> <input id="n" type="range" min="1" max="8" value="1" /></label>
+  <label>L (nm) = <span id="lv">1.00</span> <input id="L" type="range" min="50" max="400" value="100" /></label>
+  <p class="meta" id="e">E = —</p>
+</main>
+<script>
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");
+const nEl = document.getElementById("n");
+const LEl = document.getElementById("L");
+const nv = document.getElementById("nv");
+const lv = document.getElementById("lv");
+const eEl = document.getElementById("e");
+
+function draw() {
+  const n = Number(nEl.value);
+  const Lnm = Number(LEl.value) / 100;
+  nv.textContent = n;
+  lv.textContent = Lnm.toFixed(2);
+  const L = Lnm * 1e-9;
+  const hbar = 1.054571817e-34;
+  const m = 9.1093837e-31;
+  const E = (n * n * Math.PI * Math.PI * hbar * hbar) / (2 * m * L * L);
+  eEl.textContent = `E_${n} ≈ ${(E / 1.602176634e-19).toExponential(3)} eV`;
+
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+  ctx.strokeStyle = "#2a3358";
+  ctx.beginPath();
+  ctx.moveTo(40, h / 2);
+  ctx.lineTo(w - 20, h / 2);
+  ctx.stroke();
+  ctx.strokeStyle = "#a78bfa";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let i = 0; i <= 400; i++) {
+    const x = i / 400;
+    const psi = Math.sqrt(2 / Lnm) * Math.sin(n * Math.PI * x);
+    const px = 40 + x * (w - 60);
+    const py = h / 2 - psi * 70;
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+  ctx.lineWidth = 1;
+}
+nEl.oninput = LEl.oninput = draw;
+draw();
+</script>
+</body>
+</html>
